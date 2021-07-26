@@ -1,0 +1,47 @@
+import java.awt.Color;
+public class Function_Theme {
+    GUI gui;
+    public Function_Theme(GUI gui){
+        this.gui = gui;
+    }
+    public void changeTheme(String theme){
+        switch(theme){
+            case "Light" : 
+                gui.window.getContentPane().setBackground(Color.white);
+                // white background
+                gui.textArea.setBackground(Color.white);
+                // white font color
+                gui.textArea.setForeground(Color.black);
+                break;
+            case "Dark" : 
+                gui.window.getContentPane().setBackground(Color.black);
+                // black background
+                gui.textArea.setBackground(Color.black);
+                // white font color
+                gui.textArea.setForeground(Color.white);
+                break;
+            case "Sunny" : 
+                gui.window.getContentPane().setBackground(new Color(255,255,153));
+                // yellow background
+                gui.textArea.setBackground(new Color(255,255,153));
+                // purplish font color
+                gui.textArea.setForeground(new Color(153,0,153));
+                break;
+            case "Sakura" : 
+                gui.window.getContentPane().setBackground(new Color(255,153,204));
+                // light pink background
+                gui.textArea.setBackground(new Color(255,153,204));
+                // white font color
+                gui.textArea.setForeground(Color.white);
+                break;
+            case "Forest" : 
+                gui.window.getContentPane().setBackground(new Color(0,102,51));
+                // Chalkboard green background
+                gui.textArea.setBackground(new Color(0,102,51));
+                // very light pink font color
+                gui.textArea.setForeground(new Color(255,204,255));
+                break;
+        }
+        
+    }
+}
