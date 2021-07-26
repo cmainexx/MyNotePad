@@ -1,0 +1,99 @@
+import java.awt.FileDialog;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+
+//FunctionFile Class
+public class Function_File {
+    GUI gui;
+    String fileName;
+    String fileAddress;
+    
+    //Function File constructor
+    public Function_File(GUI gui){
+        this.gui = gui;  
+    }
+        public void newFile(){
+        gui.textArea.setText("");
+        gui.window.setTitle("MyWordPad New");
+        fileName = null;
+        fileAddress = null;
+    }
+    public void open(){
+        FileDialog fd = new FileDialog(gui.window, "Open", FileDialog.LOAD);
+        fd.setVisible(true);
+        
+        if (fd.getFile() !=  null) {
+            //getting the file and setting it as the fileName
+            fileName = fd.getFile();
+            //getting the location of the file and setting it as fileAddress
+            fileAddress = fd.getDirectory();
+            //setting the windows name to whatever the text file is saved as
+            gui.window.setTitle(fileName);
+        }
+        try{
+            //buffered reader requires both filename and address to load
+            BufferedReader br = new BufferedReader (new FileReader(fileAddress + fileName));
+            //sets the textarea to blank
+            gui.textArea.setText("");
+            String line = null;
+            //using the while loop we will read each and every line
+            while((line = br.readLine()) != null){
+                //and copy the line and paste the line and then add a new line using the \n
+                gui.textArea.append(line + "\n");
+            }
+            br.close();
+        }catch(Exception e){
+            // if anything goes wrong and file wasn't able to load, then this message will appear
+            System.out.println("FILE NOT OPENED");
+        }
+    }
+    public void save(){
+        if(fileName == null){
+            //when creating a new document, fileName is automatically set to Null
+            //so if it happens that the note has never been saved before, we will be directed to Save As
+            saveAs();
+        } else {
+            // However if the document has been saved before, then , the else statement wil commence.
+            try{
+                //FileWrite needs both fileAddress and fileName to save the file on
+                FileWriter fw = new FileWriter(fileAddress + fileName);
+                //gets the text written on the whole notepad to save
+                fw.write(gui.textArea.getText());
+                //the title of the file name will already be there, because we are only over writing the text.
+                gui.window.setTitle(fileName);
+                fw.close();
+                
+            } catch (Exception e){
+                System.out.println("SOMETHING WENT WRONG");
+            }
+        }
+        
+    }
+    public void saveAs(){
+        FileDialog fd = new FileDialog(gui.window, "Save As", FileDialog.SAVE);
+        fd.setVisible(true);
+        
+        //like I said, if the document you are working on has already been saved before, 
+        if(fd.getFile() != null){
+            // then getFile would be passed on to the fileName variable
+            fileName = fd.getFile();
+            // then getDirectory would be passed on the the fileAddress
+            fileAddress = fd.getDirectory();
+            // And set the Wordpad Window's name to whatever the user saved the file as. 
+            gui.window.setTitle(fileName);
+        }
+        try{
+            // Using filewrite to get all the contents of the wordpad the user the user typed to save it.
+            FileWriter fw = new FileWriter(fileAddress + fileName);
+            fw.write(gui.textArea.getText());
+            fw.close();
+            
+        }catch(Exception e){
+            System.out.println("SOMETHING WENT WRONG");
+        }
+    }
+
+}
+
+
