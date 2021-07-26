@@ -1,0 +1,340 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.BorderFactory;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.event.UndoableEditListener;
+import javax.swing.undo.UndoManager;
+
+public class GUI implements ActionListener{
+
+    JFrame window; 
+    //Text area
+    JTextArea textArea;
+    JScrollPane scrollPane;
+    //Top Menu Bar
+    JMenuBar menuBar;
+    JMenu menuFile, menuEdit, menuFormat, menuTheme;
+    //File Menu Items
+    JMenuItem iNew, iOpen, iSave, iSaveAs;
+    //Edit Menu
+    JMenuItem iUndo, iRedo;
+    //Format Menu
+    JMenuItem iWrap;
+    boolean wordWrapOn = false;
+    JMenu menuFont, menuFontSize;
+        //Format Menu > Font Items
+        JMenuItem iFontArial, iFontCSMS, iFontTNR;
+        //Format Menu > Font Size Items
+        JMenuItem iFontSize8, iFontSize12, iFontSize16, iFontSize20, iFontSize24, iFontSize28;
+
+    //Theme Menu Items
+    JMenuItem iTheme1, iTheme2, iTheme3, iTheme4, iTheme5;
+            
+    //Initialization
+    Function_File file = new Function_File(this);
+    Function_Format format = new Function_Format(this);
+    Function_Theme theme = new Function_Theme (this);
+    Function_Edit edit = new Function_Edit(this);
+    
+    UndoManager um = new UndoManager();
+    
+    
+    public static void main(String[] args) {
+        new GUI();      
+    }
+    //GUI method
+    public GUI(){
+        //calling the createWindow constructor
+        createWindow(); 
+        //calling the createTextArea constructor
+        createTextArea();
+        //calling the menuBar constructor
+        createMenuBar();
+        //calling the createFileMenu constructor
+        createFileMenu();
+        //calling the createEditMenu constructor
+        createEditMenu();
+        //calling the createFormatMenu constructor
+        createFormatMenu();
+        //calling the createThemeMenu constructor
+        createThemeMenu();
+        
+        
+        
+        //setting default font for the wordpad
+        format.selectedFont = "Arial";
+        //setting the default font size for the word pad
+        format.createFont(16);
+        //activating the wordwrap as a default
+        format.wordWrap();
+        //setting the default color
+        theme.changeTheme("Light");
+        
+        
+        //reveals the window
+        window.setVisible(true); 
+    }
+    //createWindow method
+    public void createWindow(){
+        //naming my notepad
+        window = new JFrame("MyWordPad");
+        //default size
+        window.setSize(800,600); 
+        //closing the window properly
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+    }
+    //createTextArea method
+    public void createTextArea(){
+        textArea = new JTextArea();
+        /// 
+        textArea.getDocument().addUndoableEditListener(
+        new UndoableEditListener(){
+            public void undoableEditHappened (UndoableEditEvent e){
+                um.addEdit(e.getEdit());
+            }
+        });
+        //creates a scrollbar,
+        scrollPane = new JScrollPane(textArea, 
+                //allows the vertical scrollbar only when needed
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
+                //allows the horizontal scrollbar only when needed
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        //removes the border around the window
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        
+        //adding the scrollPane to the window
+        window.add(scrollPane);
+        //adding the textarea to the window
+        //window.add(textArea);
+      
+    }
+    //createMenuBar method
+    public void createMenuBar(){
+        menuBar = new JMenuBar();
+        //setting the menubar to the window
+        window.setJMenuBar(menuBar);
+        
+        //creating a menu folder named 'File'
+        menuFile = new JMenu("File");
+        //adding a menubar called menuFile
+        menuBar.add(menuFile);
+        
+        //creating a menu folder named 'Edit'
+        menuEdit = new JMenu("Edit");
+        //adding a menubar called menuEdit
+        menuBar.add(menuEdit);
+        
+        //creating a menu folder named 'Format'
+        menuFormat = new JMenu("Format");
+        //adding a menubar called menuFormat
+        menuBar.add(menuFormat);
+        
+        //creating a menu folder named 'Theme'
+        menuTheme = new JMenu("Theme");
+        //adding a menubar called menuColor
+        menuBar.add(menuTheme);
+    }
+    
+    //createFileMenu method
+    public void createFileMenu(){
+    //creating an item in the File Menu and naming it 'New'
+    
+    iNew = new JMenuItem("New");
+    //actionlistener command
+    //actionlistener has already been implemented to this (GUI) class
+    iNew.addActionListener(this);
+    //action command sets the command to new
+    iNew.setActionCommand("New");
+    //adding the 'New' item in the File folder of the MenuBar
+    menuFile.add(iNew);
+    
+    //creating an item in the File Menu and naming it 'Open'
+    iOpen = new JMenuItem("Open");
+    iOpen.addActionListener(this);
+    iOpen.setActionCommand("Open");   
+    //adding the 'Open' item in the File folder of the MenuBar
+    menuFile.add(iOpen);
+    
+    //creating an item in the File Menu and naming it 'Save'
+    iSave = new JMenuItem("Save");
+    iSave.addActionListener(this);
+    iSave.setActionCommand("Save");   
+    //adding the 'Save' item in the File folder of the MenuBar
+    menuFile.add(iSave);
+    
+    //creating an item in the File Menu and naming it 'Save As'
+    iSaveAs = new JMenuItem("Save As");
+    iSaveAs.addActionListener(this);
+    iSaveAs.setActionCommand("SaveAs");   
+    //adding the 'Save As' item in the File folder of the MenuBar
+    menuFile.add(iSaveAs);
+    }
+    public void createEditMenu(){
+        iUndo = new JMenuItem("Undo");
+        iUndo.addActionListener(this);
+        iUndo.setActionCommand("Undo");
+        menuEdit.add(iUndo);
+        
+        iRedo = new JMenuItem("Redo");
+        iRedo.addActionListener(this);
+        iRedo.setActionCommand("Redo");
+        menuEdit.add(iRedo);
+    }
+    public void createFormatMenu(){
+        
+        //creating the wrap item
+        iWrap = new JMenuItem("Word Wrap: Off");
+        iWrap.addActionListener(this);
+        iWrap.setActionCommand("Word Wrap");
+        //adding the wrap item in the Format Menu
+        menuFormat.add(iWrap);
+        
+        //creating the Font Menu 
+        menuFont = new JMenu("Font");
+        //adding the Font Menu inside the Format Menu
+        menuFormat.add(menuFont);
+       
+        //creating the Arial item
+        iFontArial = new JMenuItem("Arial");
+        iFontArial.addActionListener(this);
+        iFontArial.setActionCommand("Arial");
+        //adding the Arial item to the Font Menu
+        menuFont.add(iFontArial);
+        
+        //creating the Comic Sans item
+        iFontCSMS = new JMenuItem("Comic Sans MS");
+        iFontCSMS.addActionListener(this);
+        iFontCSMS.setActionCommand("Comic Sans MS");
+        //adding the Comic Sans item to the Font Menu
+        menuFont.add(iFontCSMS);
+        
+        //creating the Times New Roman item
+        iFontTNR = new JMenuItem("Times New Roman");
+        iFontTNR.addActionListener(this);
+        iFontTNR.setActionCommand("Times New Roman");
+        //adding the Times New Roman item to the Font Menu
+        menuFont.add(iFontTNR);
+        
+        //creating the FontSize Menu
+        menuFontSize = new JMenu("Font Size");
+        //adding the Font Size Menu inside the Format Menu
+        menuFormat.add(menuFontSize);
+        
+        //adding each and every item and adding it the FontSize Menu
+        iFontSize8 = new JMenuItem("8");
+        iFontSize8.addActionListener(this);
+        iFontSize8.setActionCommand("size8");
+        menuFontSize.add(iFontSize8);
+        
+        iFontSize12 = new JMenuItem("12");
+        iFontSize12.addActionListener(this);
+        iFontSize12.setActionCommand("size12");
+        menuFontSize.add(iFontSize12);
+        
+        iFontSize16 = new JMenuItem("16");
+        iFontSize16.addActionListener(this);
+        iFontSize16.setActionCommand("size16");
+        menuFontSize.add(iFontSize16);
+        
+        iFontSize20 = new JMenuItem("20");
+        iFontSize20.addActionListener(this);
+        iFontSize20.setActionCommand("size20");
+        menuFontSize.add(iFontSize20);
+        
+        iFontSize24 = new JMenuItem("24");
+        iFontSize24.addActionListener(this);
+        iFontSize24.setActionCommand("size24");
+        menuFontSize.add(iFontSize24);
+        
+        iFontSize28 = new JMenuItem("28");
+        iFontSize28.addActionListener(this);
+        iFontSize28.setActionCommand("size28");
+        menuFontSize.add(iFontSize28);
+    }
+    public void createThemeMenu(){
+        iTheme1 = new JMenuItem("Light Theme");
+        iTheme1.addActionListener(this);
+        iTheme1.setActionCommand("Light");
+        menuTheme.add(iTheme1); 
+        
+        iTheme2 = new JMenuItem("Dark Theme");
+        iTheme2.addActionListener(this);
+        iTheme2.setActionCommand("Dark");
+        menuTheme.add(iTheme2); 
+        
+        iTheme3 = new JMenuItem("Sunny Theme");
+        iTheme3.addActionListener(this);
+        iTheme3.setActionCommand("Sunny");
+        menuTheme.add(iTheme3); 
+        
+        iTheme4 = new JMenuItem("Sakura Theme");
+        iTheme4.addActionListener(this);
+        iTheme4.setActionCommand("Sakura");
+        menuTheme.add(iTheme4); 
+        
+        iTheme5 = new JMenuItem("Forest Theme");
+        iTheme5.addActionListener(this);
+        iTheme5.setActionCommand("Forest");
+        menuTheme.add(iTheme5); 
+        
+    }
+    
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String command = e.getActionCommand();
+        
+        switch(command){
+            //if command is New, then the newFile method is called
+            case "New" : file.newFile(); break;
+            //if command is Open, then the open method is called
+            case "Open" : file.open(); break;
+            //if command is Save, then the save method is called
+            case "Save" : file.save(); break;
+            //if command is SaveAs, then the open method is called
+            case "SaveAs" : file.saveAs(); break;
+            //if command is Undo, then the Undo method is called
+            case "Undo" : edit.undo(); break;
+            //if command is Redo, then the Redo method is called
+            case "Redo" : edit.redo(); break;
+            //if command is Word Wrap, then wordWrap method is called
+            case "Word Wrap" : format.wordWrap(); break;
+            //if command is Arial, then the Arial font is set
+            case "Arial" : format.setFont(command); break;
+            //if command is Comic Sand, then the Comic Sans font is set
+            case "Comic Sans MS" : format.setFont(command); break;
+            //if command is Times New Roman, then the Times New Roman font is set
+            case "Times New Roman" : format.setFont(command); break;
+            //if command is 8, then the font size is set
+            case "size8" : format.createFont(8);break;
+            //if command is 12, then the font size is set
+            case "size12" : format.createFont(12);break;
+            //if command is 16, then the font size is set
+            case "size16" : format.createFont(16);break;
+            //if command is 20, then the font size is set
+            case "size20" : format.createFont(20);break;
+            //if command is 24, then the font size is set
+            case "size24" : format.createFont(24);break;
+            //if command is 28, then the font size is set
+            case "size28" : format.createFont(28);break;
+            //if command is Light , then the change theme method is called
+            case "Light" : theme.changeTheme(command); break;
+            //if command is Dark , then the change theme method is called
+            case "Dark" : theme.changeTheme(command); break;
+            //if command is Sunny , then the change theme method is called
+            case "Sunny" : theme.changeTheme(command); break;
+            //if command is Sakura , then the change theme method is called
+            case "Sakura" : theme.changeTheme(command); break;
+            //if command is Forest , then the change theme method is called
+            case "Forest" : theme.changeTheme(command); break;
+            
+        }
+    }
+
+}
+
